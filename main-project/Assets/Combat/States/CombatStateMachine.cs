@@ -27,11 +27,37 @@ public class CombatStateMachine : MonoBehaviour
     public bool GetCharacter() { //true for dale, false for gail
         return selectedCharacter;
     }
+    public CharacterData GetCharacterData() {
+        return CombatSystem.system.GetCharacterData(selectedCharacter);
+    }
+    public CharacterData GetCharacterData(bool selectedCharacter) {
+        return CombatSystem.system.GetCharacterData(selectedCharacter);
+    }
+    public Skill[] GetSkillList() {
+        return GetCharacterData().GetEquippedSkills();
+    }
+    public Skill[] GetSkillList(bool selectedCharacter) {
+        return GetCharacterData(selectedCharacter).GetEquippedSkills();
+    }
     public void ChangeCharacter(bool character) { //true for dale, false for gail
         selectedCharacter = character; 
     }
     public void ChangeCharacter() { //true for dale, false for gail
         selectedCharacter = !selectedCharacter;
+    }
+
+    public void EndPlayerTurn() {
+        playerTurns--;
+        if (playerTurns <= 0) {
+            ChangeState("EnemyAttack");
+        }
+        else {
+            ChangeState("PlayerActionSelection");
+        }
+    }
+
+    public void StartPlayerTurn() { //Call this method after enemy turn ends
+        CombatSystem.system.IncreaseTurnNumber(1);
     }
 
     public void ChangeState(string stateType) { //Communicates with CombatState.ChangeState();

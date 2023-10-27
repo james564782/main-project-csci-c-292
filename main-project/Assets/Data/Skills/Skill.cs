@@ -6,4 +6,9 @@ using UnityEngine;
 public class Skill : ScriptableObject
 {
     [SerializeField] SkillEvent[] events;
+    [SerializeField] int sP;
+
+    public int GetSPCost() {
+        return sP;
+    }
 }

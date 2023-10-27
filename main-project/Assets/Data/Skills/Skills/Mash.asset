@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 864d035bc35b70740b481e7cd3c9469e, type: 3}
-  m_Name: 100
+  m_Script: {fileID: 11500000, guid: ca615a7e26449e64ea6aa4bd84b4dfc3, type: 3}
+  m_Name: Mash
   m_EditorClassIdentifier: 
-  qTE: 0
-  animation: {fileID: 0}
-  damage: 100
+  events:
+  - {fileID: 11400000, guid: 2ee9059e066c1834e8a35e6decebef78, type: 2}
+  sP: 1

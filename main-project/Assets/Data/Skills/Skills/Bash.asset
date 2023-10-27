@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   events:
   - {fileID: 11400000, guid: 2ee9059e066c1834e8a35e6decebef78, type: 2}
+  sP: 0

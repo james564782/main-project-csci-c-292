@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 864d035bc35b70740b481e7cd3c9469e, type: 3}
-  m_Name: 100
+  m_Script: {fileID: 11500000, guid: 3ddc33801e66363478bd1b879f810a83, type: 3}
+  m_Name: WhiteSentinel
   m_EditorClassIdentifier: 
-  qTE: 0
-  animation: {fileID: 0}
-  damage: 100
+  max_Vitality: 10
+  max_SP: 17
+  power: 11
+  name: Sentinel
+  defaultSprite: {fileID: 2013213498, guid: 9f3d49232c7bf9440ad23620982fa97b, type: 3}

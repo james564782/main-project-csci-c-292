@@ -5,12 +5,37 @@ using UnityEngine;
 public class EntityData : ScriptableObject {
 
     [Header("Stats")]
-    [SerializeField][Range(1, 100)] protected int max_Vitality;
-    [SerializeField][Range(1, 100)] protected int max_Instinct;
-    [SerializeField][Range(1, 100)] protected int max_Power;
+    [SerializeField][Range(1, 100)] protected int max_Vitality; //Health
+    [SerializeField][Range(1, 100)] protected int max_SP;
+    [SerializeField][Range(1, 100)] protected int power;
     protected int current_Vitality;
-    protected int current_Instinct;
-    protected int current_Power;
+    protected int current_SP;
 
-
+    public int GetCurrentVitality() {
+        return current_Vitality;
+    }
+    public int GetMaxVitality() {
+        return max_Vitality;
+    }
+    public int GetCurrentSP() {
+        return current_SP;
+    }
+    public int GetMaxSP() {
+        return max_SP;
+    }
+    public int GetPower() {
+        return power;
+    }
+    public void SetCurrentVitality(int new_Vitality) {
+        current_Vitality = Mathf.Clamp(new_Vitality, 0, max_Vitality);
+    }
+    public void ModifyCurrentVitality(int modified_Vitality) {
+        current_Vitality = Mathf.Clamp(current_Vitality + modified_Vitality, 0, max_Vitality);
+    }
+    public void SetCurrentSP(int new_SP) {
+        current_SP = Mathf.Clamp(new_SP, 0, max_SP);
+    }
+    public void ModifyCurrentSP(int modified_SP) {
+        current_SP = Mathf.Clamp(current_SP + modified_SP, 0, max_SP);
+    }
 }

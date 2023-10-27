@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19e7fe333093dc345ba5b2b49eff8cbd, type: 3}
   m_Name: Dale
   m_EditorClassIdentifier: 
-  max_Vitality: 0
-  max_Instinct: 0
-  max_Power: 0
-  skills: []
-  equippedSkills: []
+  max_Vitality: 54
+  max_SP: 29
+  power: 49
+  skills:
+  - {fileID: 11400000, guid: cecd638262c9ec74e902dcd02f568413, type: 2}
+  - {fileID: 11400000, guid: 81184c92431e65148a04949115b08c04, type: 2}
+  equippedSkills:
+  - {fileID: 11400000, guid: cecd638262c9ec74e902dcd02f568413, type: 2}
+  - {fileID: 11400000, guid: 81184c92431e65148a04949115b08c04, type: 2}
+  defaultSprite: {fileID: 1556558648, guid: 738f4b858e6b5e54b92350a5d93aa814, type: 3}

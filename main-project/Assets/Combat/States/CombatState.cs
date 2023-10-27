@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class CombatState : MonoBehaviour {
 
-    private CombatStateMachine stateMachine;
+    protected CombatStateMachine stateMachine;
     public virtual void StateStart() {
 
     }
