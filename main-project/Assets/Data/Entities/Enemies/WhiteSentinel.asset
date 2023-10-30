@@ -15,5 +15,5 @@ MonoBehaviour:
   max_Vitality: 10
   max_SP: 17
   power: 11
-  name: Sentinel
+  entityName: Sentinel
   defaultSprite: {fileID: 2013213498, guid: 9f3d49232c7bf9440ad23620982fa97b, type: 3}

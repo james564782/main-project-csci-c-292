@@ -72,6 +72,19 @@ public class CombatStateMachine : MonoBehaviour
         }
     }
 
+    public void ChangeState(string stateType, Skill skill) { //Communicates with CombatState.ChangeState(); If using skill, then that is used here too
+        currentState = GetState(stateType);
+        ((PlayerSkillUsage)currentState).SetSkill(skill); //This should only be used with skillUsage
+        Debug.Log("Changed to type: " + currentState.GetType() + " of " + skill.name);
+
+        try {
+            currentState.StateStart();
+        }
+        catch (Exception e) {
+            Debug.LogException(e);
+        }
+    }
+
     private CombatState GetState(string stateType) {
         foreach (CombatState state in states) {
             if (state.GetType() == Type.GetType(stateType)) {

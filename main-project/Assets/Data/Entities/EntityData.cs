@@ -10,6 +10,9 @@ public class EntityData : ScriptableObject {
     [SerializeField][Range(1, 100)] protected int power;
     protected int current_Vitality;
     protected int current_SP;
+    protected int[,] bleed; //[[turns, damage][turns, damage],[turns, damage]]
+    protected float[,] statModification; //[[modifier, count]]
+    protected bool alive = true;
 
     public int GetCurrentVitality() {
         return current_Vitality;
@@ -28,9 +31,15 @@ public class EntityData : ScriptableObject {
     }
     public void SetCurrentVitality(int new_Vitality) {
         current_Vitality = Mathf.Clamp(new_Vitality, 0, max_Vitality);
+        if (current_Vitality <= 0) {
+            alive = false;
+        }
     }
     public void ModifyCurrentVitality(int modified_Vitality) {
         current_Vitality = Mathf.Clamp(current_Vitality + modified_Vitality, 0, max_Vitality);
+        if (current_Vitality <= 0) {
+            alive = false;
+        }
     }
     public void SetCurrentSP(int new_SP) {
         current_SP = Mathf.Clamp(new_SP, 0, max_SP);

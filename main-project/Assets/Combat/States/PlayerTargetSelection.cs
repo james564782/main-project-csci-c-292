@@ -13,37 +13,6 @@ public class PlayerTargetSelection : CombatState {
         }
     }
 
-    public override void StateUpdate() {
-        if (Input.GetKey("x") || Input.GetKey(KeyCode.Backspace)) {
-            ChangeState("PlayerSkillSelection");
-        }
-
-        if ((Input.GetKeyDown("a") || Input.GetKeyDown("left")) && enemyCount <= 1) { //Left
-            selected = 0;
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-
-            }
-        }
-        else if ((Input.GetKeyDown("w") || Input.GetKeyDown("up")) && enemyCount <= 2) { //Top
-            selected = 1;
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-
-            }
-        }
-        else if ((Input.GetKeyDown("s") || Input.GetKeyDown("down")) && enemyCount <= 3) { //Bottom
-            selected = 2;
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-
-            }
-        }
-        else if ((Input.GetKeyDown("d") || Input.GetKeyDown("right")) && enemyCount <= 4) { //Right
-            selected = 4;
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-
-            }
-        }
-    }
-
     public override void StateFixedUpdate() {
 
     }

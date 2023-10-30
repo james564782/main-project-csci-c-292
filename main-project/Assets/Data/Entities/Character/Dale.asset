@@ -15,10 +15,9 @@ MonoBehaviour:
   max_Vitality: 54
   max_SP: 29
   power: 49
-  skills:
-  - {fileID: 11400000, guid: cecd638262c9ec74e902dcd02f568413, type: 2}
-  - {fileID: 11400000, guid: 81184c92431e65148a04949115b08c04, type: 2}
   equippedSkills:
   - {fileID: 11400000, guid: cecd638262c9ec74e902dcd02f568413, type: 2}
-  - {fileID: 11400000, guid: 81184c92431e65148a04949115b08c04, type: 2}
+  - {fileID: 11400000, guid: 5ec4d70fc342c2d49b14f12961ca1354, type: 2}
+  - {fileID: 11400000, guid: 4a5ce4cba9bb4f442a0d41a4fc00c3ed, type: 2}
+  - {fileID: 11400000, guid: 476f6b91f55708047ba6784698ed83fe, type: 2}
   defaultSprite: {fileID: 1556558648, guid: 738f4b858e6b5e54b92350a5d93aa814, type: 3}

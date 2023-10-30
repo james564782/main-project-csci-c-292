@@ -25,6 +25,10 @@ public abstract class CombatState : MonoBehaviour {
         ExitState();
         stateMachine.ChangeState(stateType);
     }
+    protected void ChangeState(string stateType, Skill skill) { //Communicates with CombatStateMachine.ChangeState();
+        ExitState();
+        stateMachine.ChangeState(stateType, skill);
+    }
 
     protected virtual void ExitState() {
 

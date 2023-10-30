@@ -43,6 +43,9 @@ public class PlayerSkillSelection : CombatState {
             skillSpText[selected].text = skill[selected].GetSPCost() + " SP";
             selected = (int)Mathf.Repeat(selected - 1, skill.Length);
         }
+        else if (Input.GetKeyDown("z") || Input.GetKeyDown(KeyCode.Space)) {
+            ChangeState("PlayerSkillUsage", skill[selected]);
+        }
         skillOptionText[selected].text = "<b>" + skill[selected].name + "</b>";
         skillSpText[selected].text = "<b>" + skill[selected].GetSPCost() + " SP" + "</b>";
     }

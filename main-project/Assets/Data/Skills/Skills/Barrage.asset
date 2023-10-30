@@ -10,10 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ca615a7e26449e64ea6aa4bd84b4dfc3, type: 3}
-  m_Name: Bash
+  m_Name: Barrage
   m_EditorClassIdentifier: 
   events:
   - {fileID: 11400000, guid: b19c4e9e47b32694c81c612f8eed8c3b, type: 2}
   - {fileID: 11400000, guid: 4e3ad76c3aa89d741bd8c774c436fd9e, type: 2}
+  - {fileID: 11400000, guid: d44d0f9b16495f5408dec348b089a1da, type: 2}
+  - {fileID: 11400000, guid: 4e3ad76c3aa89d741bd8c774c436fd9e, type: 2}
+  - {fileID: 11400000, guid: d44d0f9b16495f5408dec348b089a1da, type: 2}
+  - {fileID: 11400000, guid: 4e3ad76c3aa89d741bd8c774c436fd9e, type: 2}
   sP: 0
-  description: A regular attack
+  description: You make a lot of attacks a random enemy with each attack.

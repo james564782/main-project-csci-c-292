@@ -78,11 +78,16 @@ public class CombatSystem : MonoBehaviour
     }
     private void CreateEnemies() { //Called in awake to set up game. Create enemies from enemyData.
         GameObject[] enemyGameObject = new GameObject[enemyData.Length];
-        enemyEntity = new Entity[enemyData.Length];
-        for (int i = 0; i < enemyData.Length; i++) {
-            enemyGameObject[i] = Instantiate(enemyPrefab[i], enemyPosition[i]);
-            enemyGameObject[i].GetComponent<SpriteRenderer>().sprite = enemyData[i].GetSprite();
-            enemyEntity[i] = new Entity(enemyGameObject[i], enemyData[i]);
+        enemyEntity = new Entity[4];
+        for (int i = 0; i < 4; i++) {
+            if (i < enemyData.Length) {
+                enemyGameObject[i] = Instantiate(enemyPrefab[i], enemyPosition[i]);
+                enemyGameObject[i].GetComponent<SpriteRenderer>().sprite = enemyData[i].GetSprite();
+                enemyEntity[i] = new Entity(enemyGameObject[i], enemyData[i]);
+            }
+            else {
+                enemyEntity[i] = new Entity(false);
+            }
         }
     }
     private void CreateUI() {
@@ -97,7 +102,7 @@ public class CombatSystem : MonoBehaviour
             SetCharacterSP(i, characterEntity[i].data.GetMaxSP());
         }
         for (int i = 0; i < enemyHealthBar.Length;i++) {
-            if (i < enemyEntity.Length) {
+            if (i < GetEnemyCount()) {
                 int health = enemyEntity[i].data.GetCurrentVitality();
                 enemyHealthBar[i].gameObject.SetActive(true);
                 enemyName[i].enabled = true;
@@ -165,10 +170,22 @@ public class CombatSystem : MonoBehaviour
         this.turnNumber++;
     }
     public int GetEnemyCount() {
-        return enemyEntity.Length;
+        int count = 0;
+        foreach (Entity entity in enemyEntity) {
+            if (entity.GetAlive()) {
+                count++;
+            }
+        }
+        return count;
+    }
+    public Entity[] GetEnemyEntities() {
+        return enemyEntity;
+    }
+    public Entity GetCharacterEntity(int index) {
+        return characterEntity[index];
     }
 
-    struct Cell {
+    public struct Cell {
         //private Entity entity; //null if nothing
         //private Transform position;
         public Entity entity { get; set; }
@@ -183,12 +200,30 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
-    struct Entity {
+    public struct Entity {
         public GameObject gameObject { get; set; }
         public EntityData data { get; set; }
+        private float highlightModifier;
+        private bool alive;
         public Entity(GameObject entityGameObject, EntityData entityData) : this() {
             this.gameObject = entityGameObject;
             this.data = entityData;
+            this.highlightModifier = 1.2f;
+            alive = true;
+        }
+        public Entity(bool alive) : this() {
+            alive = false;
+        }
+        public void ToggleSelected(bool selected) {
+            if (selected && alive) {
+                gameObject.transform.localScale = new Vector3(highlightModifier, highlightModifier, highlightModifier);
+            }
+            else if (alive) {
+                gameObject.transform.localScale = Vector3.one;
+            }
+        }
+        public bool GetAlive() {
+            return alive;
         }
     }
 }
