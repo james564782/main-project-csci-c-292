@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3ddc33801e66363478bd1b879f810a83, type: 3}
-  m_Name: WhiteSentinel
+  m_Name: WhiteSentry
   m_EditorClassIdentifier: 
-  max_Vitality: 10
+  max_Vitality: 50
   max_SP: 17
   power: 11
-  entityName: Sentinel
+  entityName: Sentry
   defaultSprite: {fileID: 2013213498, guid: 9f3d49232c7bf9440ad23620982fa97b, type: 3}

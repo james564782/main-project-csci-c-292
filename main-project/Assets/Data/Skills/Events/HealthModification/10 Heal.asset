@@ -12,6 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b196f1e83bfa5ff48b62c16f8b3622aa, type: 3}
   m_Name: 10 Heal
   m_EditorClassIdentifier: 
-  qTE: 0
   animation: {fileID: 0}
-  damage: -10
+  value: -10

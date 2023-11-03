@@ -15,6 +15,15 @@ public class SkillTarget : SkillEvent {
         public bool[] GetTargets() {
             return target;
         }
+        public int GetTargetCount() {
+            int i = 0;
+            foreach (bool t in target) {
+                if (t) {
+                    i++;
+                }
+            }
+            return i;
+        }
         public bool GetTarget(int index) {
             return target[index];
         }

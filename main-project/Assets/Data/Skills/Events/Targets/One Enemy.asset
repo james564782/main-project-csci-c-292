@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11ab9e2a2421d1b42bcaecad0a33c981, type: 3}
   m_Name: One Enemy
   m_EditorClassIdentifier: 
-  qTE: 0
   animation: {fileID: 0}
+  qTE: 0
   targets:
   - target: 010000000000
   - target: 000100000000

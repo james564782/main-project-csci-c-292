@@ -13,7 +13,7 @@ public class EnemyAttack : CombatState {
     }
 
     IEnumerator TestingEndState() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 1; i <= 4; i++) {
             yield return new WaitForSeconds(1);
             Debug.Log("Testing Enemy Attack: " + i);
         }

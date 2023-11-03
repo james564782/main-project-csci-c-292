@@ -30,6 +30,14 @@ public abstract class CombatState : MonoBehaviour {
         stateMachine.ChangeState(stateType, skill);
     }
 
+    protected void ChangeState(string stateType, bool endPlayerTurn) {
+        ExitState();
+        if (endPlayerTurn) {
+            stateMachine.EndPlayerTurn();
+        }
+        stateMachine.ChangeState(stateType);
+    }
+
     protected virtual void ExitState() {
 
     }

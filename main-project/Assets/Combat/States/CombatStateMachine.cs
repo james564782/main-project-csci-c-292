@@ -48,7 +48,9 @@ public class CombatStateMachine : MonoBehaviour
 
     public void EndPlayerTurn() {
         playerTurns--;
+        selectedCharacter = !selectedCharacter;
         if (playerTurns <= 0) {
+            playerTurns = 2;
             ChangeState("EnemyAttack");
         }
         else {

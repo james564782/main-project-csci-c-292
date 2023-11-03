@@ -7,7 +7,7 @@ public class PlayerSkillUsage : CombatState {
 
     private Skill skill;
     private SkillEvent currentEvent;
-    private bool[] currentTarget;
+    private bool[] currentTarget = new bool[] { false, false, false, false, false, false };
     public override void StateStart() {
         StartCoroutine(SkillUsage());
     }
@@ -25,12 +25,11 @@ public class PlayerSkillUsage : CombatState {
 
     IEnumerator SkillUsage() {
         Debug.Log("Initial Pause");
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.25f);
         Debug.Log("Start Skill Usage");
         foreach (var skillEvent in skill.GetEvents()) {
             if (skillEvent is SkillHealthModification) {
                 ResolveHealthModify((SkillHealthModification)skillEvent, currentTarget);
-                Debug.Log("Health Modify");
             }
             else if (skillEvent is SkillBleed) {
                 Debug.Log("Bleed");
@@ -39,12 +38,18 @@ public class PlayerSkillUsage : CombatState {
                 Debug.Log("Stat Modify");
             }
             else if (skillEvent is SkillTarget) {
+                if (((SkillTarget)skillEvent).targets.Length <= 0) {
+                    break;
+                }
                 int enemyCount = CombatSystem.system.GetEnemyCount();
                 int selected = 0;
                 SkillTarget.Targets[] targets = ((SkillTarget)skillEvent).targets;
                 bool[] target = new bool[6];
                 if (targets.Length > 1) {
                     target = targets[selected].GetTargets();
+                }
+                if (targets[selected].GetTargets()[4] || targets[selected].GetTargets()[5]) {
+                    enemyCount = 2; //This might not work anymore if one of the players die.
                 }
                 while (!Input.GetKeyDown("z") && !Input.GetKeyDown(KeyCode.Space) && targets.Length > 1) {
                     if (Input.GetKeyDown("s") || Input.GetKeyDown("down") || Input.GetKeyDown("left") || Input.GetKeyDown("a")) {
@@ -57,20 +62,25 @@ public class PlayerSkillUsage : CombatState {
 
                     yield return null;
                 }
+                target = targets[selected].GetTargets();
                 currentTarget = target;
                 RemoveHighlight();
             }
         }
-        yield return null;
-        Debug.Log("End Skill Usage");
+        stateMachine.EndPlayerTurn();
     }
 
     private void ResolveHealthModify(SkillHealthModification hpMod, bool[] currentTarget) {
         CombatSystem.Entity[] entity = CombatSystem.system.GetEnemyEntities();
         CombatSystem.Entity[] characters = new CombatSystem.Entity[] { CombatSystem.system.GetCharacterEntity(0), CombatSystem.system.GetCharacterEntity(1) };
-        for (int i = 0; i < 4; i ++) {
-            if (entity[i].GetAlive()) {
-
+        for (int i = 0; i < 4; i++) {
+            if (entity[i].GetAlive() && currentTarget[i]) {
+                CombatSystem.system.ModifyEnemyHealth(i, -hpMod.GetValue());
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (characters[i].GetAlive() && currentTarget[4 + i]) {
+                CombatSystem.system.ModifyCharacterHealth(i, -hpMod.GetValue());
             }
         }
     }
@@ -82,9 +92,11 @@ public class PlayerSkillUsage : CombatState {
             if (entity[i].GetAlive()) {
                 if (target[i]) {
                     entity[i].ToggleSelected(true);
+                    CombatSystem.system.SetEnemyImageSelected(i, true);
                 }
                 else {
                     entity[i].ToggleSelected(false);
+                    CombatSystem.system.SetEnemyImageSelected(i, false);
                 }
             }
         }
@@ -92,17 +104,21 @@ public class PlayerSkillUsage : CombatState {
         if (characters[0].GetAlive()) {
             if (target[4]) {
                 characters[0].ToggleSelected(true);
+                CombatSystem.system.SetCharacterImageSelected(0, true);
             }
             else {
                 characters[0].ToggleSelected(false);
+                CombatSystem.system.SetCharacterImageSelected(0, false);
             }
         }
         if (characters[1].GetAlive()) {
             if (target[5]) {
                 characters[1].ToggleSelected(true);
+                CombatSystem.system.SetCharacterImageSelected(1, true);
             }
             else {
                 characters[1].ToggleSelected(false);
+                CombatSystem.system.SetCharacterImageSelected(1, false);
             }
         }
     }
@@ -110,8 +126,11 @@ public class PlayerSkillUsage : CombatState {
         CombatSystem.Entity[] entity = CombatSystem.system.GetEnemyEntities();
         for (int i = 0; i < 4; i++) {
             entity[i].ToggleSelected(false);
+            CombatSystem.system.SetEnemyImageSelected(i, false);
         }
         CombatSystem.system.GetCharacterEntity(0).ToggleSelected(false);
         CombatSystem.system.GetCharacterEntity(1).ToggleSelected(false);
+        CombatSystem.system.SetCharacterImageSelected(0, false);
+        CombatSystem.system.SetCharacterImageSelected(1, false);
     }
 }

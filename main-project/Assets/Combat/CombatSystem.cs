@@ -84,6 +84,7 @@ public class CombatSystem : MonoBehaviour
                 enemyGameObject[i] = Instantiate(enemyPrefab[i], enemyPosition[i]);
                 enemyGameObject[i].GetComponent<SpriteRenderer>().sprite = enemyData[i].GetSprite();
                 enemyEntity[i] = new Entity(enemyGameObject[i], enemyData[i]);
+                enemyGameObject[i].GetComponent<Animator>().Play("Sentry01Idle", 0, (i % 2f) / 2f);
             }
             else {
                 enemyEntity[i] = new Entity(false);
@@ -119,39 +120,38 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
-    private void SetCharacterHealth(int characterIndex, int healthSet) {
+    public void SetCharacterHealth(int characterIndex, int healthSet) {
         characterEntity[characterIndex].data.SetCurrentVitality(healthSet);
         int health = characterEntity[characterIndex].data.GetCurrentVitality();
         characterHealthBar[characterIndex].value = health;
         characterHealthText[characterIndex].text = "HP: " + health;
     }
-    private void ModifyCharacterHealth(int characterIndex, int healthModification) {
+    public void ModifyCharacterHealth(int characterIndex, int healthModification) {
         characterEntity[characterIndex].data.ModifyCurrentVitality(healthModification);
         int health = characterEntity[characterIndex].data.GetCurrentVitality();
         characterHealthBar[characterIndex].value = health;
         characterHealthText[characterIndex].text = "HP: " + health;
     }
-    private void SetCharacterSP(int characterIndex, int spSet) {
+    public void SetCharacterSP(int characterIndex, int spSet) {
         characterEntity[characterIndex].data.SetCurrentSP(spSet);
         int sP = characterEntity[characterIndex].data.GetCurrentSP();
         characterSpBar[characterIndex].value = sP;
         characterSpText[characterIndex].text = "SP: " + sP;
     }
-    private void ModifyCharacterSP(int characterIndex, int spModification) {
+    public void ModifyCharacterSP(int characterIndex, int spModification) {
         characterEntity[characterIndex].data.ModifyCurrentSP(spModification);
         int sP = characterEntity[characterIndex].data.GetCurrentSP();
         characterSpBar[characterIndex].value = sP;
         characterSpText[characterIndex].text = "SP: " + sP;
     }
-    private void SetEnemyHealth(int enemyIndex, int healthSet) {
+    public void SetEnemyHealth(int enemyIndex, int healthSet) { //This method probably doesn't work well, look at ModifyEnemyHealth
         enemyEntity[enemyIndex].data.SetCurrentVitality(healthSet);
         enemyHealthBar[enemyIndex].value = enemyEntity[enemyIndex].data.GetCurrentVitality();
     }
-    private void ModifyEnemyHealth(int enemyIndex, int healthModification) {
-        enemyEntity[enemyIndex].data.ModifyCurrentVitality(healthModification);
-        enemyHealthBar[enemyIndex].value = enemyEntity[enemyIndex].data.GetCurrentVitality();
+    public void ModifyEnemyHealth(int enemyIndex, int healthModification) { //Can't modify the enemyData health since that corresponds to all enemies.
+        enemyEntity[enemyIndex].ModifyHealth(healthModification);
+        enemyHealthBar[enemyIndex].value = enemyEntity[enemyIndex].GetCurrentHealth();
     }
-    //private void 
 
     public CharacterData GetCharacterData(bool character) { //True for dale 0, false for gail 1
         return characterData[character ? 0 : 1];
@@ -178,6 +178,24 @@ public class CombatSystem : MonoBehaviour
         }
         return count;
     }
+
+    public void SetCharacterImageSelected(int index, bool value) {
+        if (value) {
+            characterImage[index].color = new Color(1, 0, 0);
+        }
+        else {
+            characterImage[index].color = new Color(1, 1, 1);
+        }
+    }
+    public void SetEnemyImageSelected(int index, bool value) {
+        if (value) {
+            enemyImage[index].color = new Color(1, 0, 0);
+        }
+        else {
+            enemyImage[index].color = new Color(1, 1, 1);
+        }
+    }
+
     public Entity[] GetEnemyEntities() {
         return enemyEntity;
     }
@@ -204,11 +222,15 @@ public class CombatSystem : MonoBehaviour
         public GameObject gameObject { get; set; }
         public EntityData data { get; set; }
         private float highlightModifier;
+        private int max_health;
+        private int current_health;
         private bool alive;
         public Entity(GameObject entityGameObject, EntityData entityData) : this() {
             this.gameObject = entityGameObject;
             this.data = entityData;
             this.highlightModifier = 1.2f;
+            this.max_health = entityData.GetMaxVitality();
+            this.current_health = this.max_health;
             alive = true;
         }
         public Entity(bool alive) : this() {
@@ -221,6 +243,15 @@ public class CombatSystem : MonoBehaviour
             else if (alive) {
                 gameObject.transform.localScale = Vector3.one;
             }
+        }
+        public void ModifyHealth(int modified_Vitality) {
+            current_health = Mathf.Clamp(current_health + modified_Vitality, 0, max_health);
+            if (current_health <= 0) {
+                alive = false;
+            }
+        }
+        public int GetCurrentHealth() {
+            return current_health;
         }
         public bool GetAlive() {
             return alive;
