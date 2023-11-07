@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: One Enemy
   m_EditorClassIdentifier: 
   animation: {fileID: 0}
-  qTE: 0
+  qTE: {fileID: 11400000, guid: 8342fd43a242fdb48b2dc658528df032, type: 2}
   targets:
   - target: 010000000000
   - target: 000100000000

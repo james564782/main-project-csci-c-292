@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerItemSelection : CombatState {
 
-    int itemSelection = 0;
+    //int itemSelection = 0;
     public override void StateStart() {
 
     }

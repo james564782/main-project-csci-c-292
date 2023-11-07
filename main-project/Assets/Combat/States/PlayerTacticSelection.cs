@@ -27,7 +27,7 @@ public class PlayerTacticSelection : CombatState {
             skipTurnText.text = "<b>Skip Turn</b>";
             runAwayText.text = "Run Away";
             if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-                stateMachine.EndPlayerTurn();
+                ChangeState("PlayerActionSelection", true);
             }
         }
         else if (selected == 1) {

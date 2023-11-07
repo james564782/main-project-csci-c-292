@@ -9,4 +9,11 @@ public class SkillBleed : SkillEvent {
     [SerializeField][Range(-255, 255)] int damage;
     [SerializeField][Range(0, 32)] int numberOfTurns;
 
+    public int GetDamage() {
+        return damage;
+    }
+    public int GetNumberOfTurns() {
+        return numberOfTurns;
+    }
+
 }

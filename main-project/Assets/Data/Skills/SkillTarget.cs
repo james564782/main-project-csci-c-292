@@ -6,7 +6,6 @@ using UnityEngine.Tilemaps;
 [CreateAssetMenu(fileName = "NewTargetData", menuName = "Skills/Target Data")]
 public class SkillTarget : SkillEvent {
 
-    [SerializeField] protected bool qTE; //Save the quick time event into this slot, if it is null then there is no event. //Will get a float value from the QTE from 0 to 1.
     public Targets[] targets;
 
     [System.Serializable]

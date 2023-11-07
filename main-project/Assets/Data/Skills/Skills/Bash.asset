@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   events:
   - {fileID: 11400000, guid: b19c4e9e47b32694c81c612f8eed8c3b, type: 2}
+  - {fileID: 11400000, guid: 8342fd43a242fdb48b2dc658528df032, type: 2}
   - {fileID: 11400000, guid: 4e3ad76c3aa89d741bd8c774c436fd9e, type: 2}
   sP: 0
   description: A regular attack

@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db00d3b77bb562045927d86aa15d74c0, type: 3}
-  m_Name: Bleed 2 Turns 6 Damage
+  m_Script: {fileID: 11500000, guid: b196f1e83bfa5ff48b62c16f8b3622aa, type: 3}
+  m_Name: 5 Damage
   m_EditorClassIdentifier: 
   animation: {fileID: 0}
-  initialDamage: 0
-  damage: 6
-  numberOfTurns: 9
+  value: 5

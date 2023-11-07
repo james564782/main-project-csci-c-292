@@ -40,10 +40,12 @@ public class CombatStateMachine : MonoBehaviour
         return GetCharacterData(selectedCharacter).GetEquippedSkills();
     }
     public void ChangeCharacter(bool character) { //true for dale, false for gail
-        selectedCharacter = character; 
+        selectedCharacter = character;
+        HighlightCharacter(true);
     }
     public void ChangeCharacter() { //true for dale, false for gail
         selectedCharacter = !selectedCharacter;
+        HighlightCharacter(true);
     }
 
     public void EndPlayerTurn() {
@@ -51,10 +53,23 @@ public class CombatStateMachine : MonoBehaviour
         selectedCharacter = !selectedCharacter;
         if (playerTurns <= 0) {
             playerTurns = 2;
+            HighlightCharacter(false);
             ChangeState("EnemyAttack");
         }
         else {
+            HighlightCharacter(true);
             ChangeState("PlayerActionSelection");
+        }
+    }
+
+    public void HighlightCharacter(bool value) { //true if highlight selected character, false if don't highlight anything/enemies turn
+        if (value) {
+            CombatSystem.system.GetCharacterGameObject(selectedCharacter).GetComponent<SpriteRenderer>().color = new Color(0.5f, 1, 0.5f);
+            CombatSystem.system.GetCharacterGameObject(!selectedCharacter).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1);
+        }
+        else {
+            CombatSystem.system.GetCharacterGameObject(true).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1);
+            CombatSystem.system.GetCharacterGameObject(false).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1);
         }
     }
 
@@ -98,6 +113,7 @@ public class CombatStateMachine : MonoBehaviour
     }
 
     private void Start() {
+        ChangeCharacter(true); //Set dale to starting character when game starts
         try {
             currentState.StateStart();
         }

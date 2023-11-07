@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerTargetSelection : CombatState {
 
-    private int selected = 0; //Left is 0, Top is 1, Bottom is 2, Right is 3
+    //private int selected = 0; //Left is 0, Top is 1, Bottom is 2, Right is 3
     private int enemyCount = 0;
     public override void StateStart() {
         enemyCount = CombatSystem.system.GetEnemyCount();

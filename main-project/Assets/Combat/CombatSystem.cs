@@ -73,7 +73,7 @@ public class CombatSystem : MonoBehaviour
         for (int i = 0; i < characterData.Length; i++) {
             characterGameObject[i] = Instantiate(characterPrefab[i], characterPosition[i]);
             characterGameObject[i].GetComponent<SpriteRenderer>().sprite = characterData[i].GetSprite();
-            characterEntity[i] = new Entity(characterGameObject[i], characterData[i]);
+            characterEntity[i] = new Entity(characterGameObject[i], characterData[i], i);
         }
     }
     private void CreateEnemies() { //Called in awake to set up game. Create enemies from enemyData.
@@ -83,7 +83,7 @@ public class CombatSystem : MonoBehaviour
             if (i < enemyData.Length) {
                 enemyGameObject[i] = Instantiate(enemyPrefab[i], enemyPosition[i]);
                 enemyGameObject[i].GetComponent<SpriteRenderer>().sprite = enemyData[i].GetSprite();
-                enemyEntity[i] = new Entity(enemyGameObject[i], enemyData[i]);
+                enemyEntity[i] = new Entity(enemyGameObject[i], enemyData[i], i);
                 enemyGameObject[i].GetComponent<Animator>().Play("Sentry01Idle", 0, (i % 2f) / 2f);
             }
             else {
@@ -152,9 +152,22 @@ public class CombatSystem : MonoBehaviour
         enemyEntity[enemyIndex].ModifyHealth(healthModification);
         enemyHealthBar[enemyIndex].value = enemyEntity[enemyIndex].GetCurrentHealth();
     }
+    public void InflictBleedingToEnemy(int index, int turnCount, int damagePerTurn) {
+        enemyEntity[index].InflictBleed(turnCount, damagePerTurn);
+    }
+    public void ResolveAllEnemyBleeding() {
+        foreach (Entity e in enemyEntity) {
+            if (e.GetAlive()) {
+                e.Bleed();
+            }
+        }
+    }
 
     public CharacterData GetCharacterData(bool character) { //True for dale 0, false for gail 1
         return characterData[character ? 0 : 1];
+    }
+    public GameObject GetCharacterGameObject(bool character) {
+        return characterEntity[character ? 0 : 1].gameObject;
     }
     
     public int GetTurnNumber() {
@@ -196,6 +209,29 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
+    public void CharacterAttack(bool character) {
+        StartCoroutine(AnimateCharacterAttack(character ? 0 : 1));
+    }
+
+    IEnumerator AnimateCharacterAttack(int characterIndex) { //Trigger this after the quick time event
+        float rate = 3f;
+        float horizontalDistance = 1.0f;
+        float[] verticalDistance = new float[] { 0.1f, 0.25f };
+        GameObject characterObject = characterEntity[characterIndex].gameObject;
+        Vector3 startingPosition = characterPosition[characterIndex].position;
+        for (float i = 0; i < 1; i += Time.deltaTime * rate) {
+            float valueA = (-Mathf.Pow(i - 0.5f, 2) * 4 + 1);
+            float[] valueB = new float[] { (-Mathf.Pow((i * 2f) - 0.5f, 2) * 4 + 1), (-Mathf.Pow(((i * 2f) - 1) - 0.5f, 2) * 4 + 1) };
+            float x = Mathf.Lerp(startingPosition.x, startingPosition.x + horizontalDistance, valueA);
+            float y = i < 0.5f ? 
+                Mathf.Lerp(startingPosition.y, startingPosition.y + verticalDistance[0], valueB[0]) : 
+                Mathf.Lerp(startingPosition.y, startingPosition.y + verticalDistance[1], valueB[1]);
+            characterObject.transform.position = new Vector3(x, y, 0);
+            yield return null;
+        }
+        characterObject.transform.position = characterPosition[characterIndex].position;
+    }
+
     public Entity[] GetEnemyEntities() {
         return enemyEntity;
     }
@@ -221,20 +257,25 @@ public class CombatSystem : MonoBehaviour
     public struct Entity {
         public GameObject gameObject { get; set; }
         public EntityData data { get; set; }
+        private int index;
         private float highlightModifier;
         private int max_health;
         private int current_health;
         private bool alive;
-        public Entity(GameObject entityGameObject, EntityData entityData) : this() {
+        private int[] bleed; //[damage, turncount]
+        public Entity(GameObject entityGameObject, EntityData entityData, int index) : this() {
+            this.index = index;
             this.gameObject = entityGameObject;
             this.data = entityData;
             this.highlightModifier = 1.2f;
             this.max_health = entityData.GetMaxVitality();
             this.current_health = this.max_health;
             alive = true;
+            this.bleed = new int[] { 0, 0 };
         }
         public Entity(bool alive) : this() {
             alive = false;
+            this.bleed = new int[] { 0, 0 };
         }
         public void ToggleSelected(bool selected) {
             if (selected && alive) {
@@ -250,6 +291,23 @@ public class CombatSystem : MonoBehaviour
                 alive = false;
             }
         }
+        public void InflictBleed(int turnCount, int damage) {//Giving the effect
+            this.bleed = new int[] { turnCount, damage };
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 0.5f, 0.5f);
+        }
+        public void Bleed() { //Damage each turn
+            if (bleed[0] > 0) {
+                CombatSystem.system.ModifyEnemyHealth(index, -bleed[1]);
+                bleed[0]--;
+            }
+            if (bleed[0] > 0) {
+                gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 0.5f, 0.5f);
+            }
+            else {
+                gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f);
+            }
+        }
+
         public int GetCurrentHealth() {
             return current_health;
         }

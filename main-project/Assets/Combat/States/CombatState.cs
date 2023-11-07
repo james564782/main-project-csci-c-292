@@ -35,7 +35,9 @@ public abstract class CombatState : MonoBehaviour {
         if (endPlayerTurn) {
             stateMachine.EndPlayerTurn();
         }
-        stateMachine.ChangeState(stateType);
+        else {
+            stateMachine.ChangeState(stateType);
+        }
     }
 
     protected virtual void ExitState() {

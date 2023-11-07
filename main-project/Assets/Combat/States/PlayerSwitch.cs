@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerSwitch : CombatState {
 
     public override void StateStart() {
-
+        stateMachine.ChangeCharacter();
+        stateMachine.ChangeState("PlayerActionSelection");
     }
 
     public override void StateUpdate() {
