@@ -9,6 +9,9 @@ public class CombatStateMachine : MonoBehaviour
     CombatState currentState;
     bool selectedCharacter = true; //true for dale, false for gail
     int playerTurns = 2;
+    [SerializeField] AudioClip selectionUISound;
+
+    bool ended = false;
 
     private void Awake() {
         InitializeVariables();
@@ -16,6 +19,7 @@ public class CombatStateMachine : MonoBehaviour
 
     private void InitializeVariables() {
         states = GetComponents<CombatState>();
+        ended = false;
         foreach (CombatState state in states) {
             state.SetCombatStateMachine(this);
             if (state is PlayerActionSelection) {
@@ -23,9 +27,21 @@ public class CombatStateMachine : MonoBehaviour
             }
         }
     }
+    public bool GetEnded() { //Has the game/level ended
+        return ended;
+    }
+    public void SetEnded(bool value) {
+        ended = value;
+    }
 
+    public void PlaySelectionUISound() {
+        SoundBoard.instance.PlayAudio(selectionUISound);
+    }
     public bool GetCharacter() { //true for dale, false for gail
         return selectedCharacter;
+    }
+    public CombatSystem.Entity GetCharacterEntity() {
+        return CombatSystem.system.GetCharacterEntity(GetCharacter() ? 0 : 1);
     }
     public CharacterData GetCharacterData() {
         return CombatSystem.system.GetCharacterData(selectedCharacter);
@@ -46,6 +62,9 @@ public class CombatStateMachine : MonoBehaviour
     public void ChangeCharacter() { //true for dale, false for gail
         selectedCharacter = !selectedCharacter;
         HighlightCharacter(true);
+    }
+    public void SpendSP(int sp) {
+        GetCharacterEntity().SpendSP(sp);
     }
 
     public void EndPlayerTurn() {
@@ -78,27 +97,31 @@ public class CombatStateMachine : MonoBehaviour
     }
 
     public void ChangeState(string stateType) { //Communicates with CombatState.ChangeState();
-        currentState = GetState(stateType);
-        Debug.Log("Changed to type: " + currentState.GetType());
+        if (!ended) {
+            currentState = GetState(stateType);
+            //Debug.Log("Changed to state: " + currentState.GetType());
 
-        try {
-            currentState.StateStart();
-        }
-        catch (Exception e) {
-            Debug.LogException(e);
+            try {
+                currentState.StateStart();
+            }
+            catch (Exception e) {
+                Debug.LogException(e);
+            }
         }
     }
 
     public void ChangeState(string stateType, Skill skill) { //Communicates with CombatState.ChangeState(); If using skill, then that is used here too
-        currentState = GetState(stateType);
-        ((PlayerSkillUsage)currentState).SetSkill(skill); //This should only be used with skillUsage
-        Debug.Log("Changed to type: " + currentState.GetType() + " of " + skill.name);
+        if (!ended) {
+            currentState = GetState(stateType);
+            ((PlayerSkillUsage)currentState).SetSkill(skill); //This should only be used with skillUsage
+                                                              //Debug.Log("Changed to state: " + currentState.GetType() + " of " + skill.name);
 
-        try {
-            currentState.StateStart();
-        }
-        catch (Exception e) {
-            Debug.LogException(e);
+            try {
+                currentState.StateStart();
+            }
+            catch (Exception e) {
+                Debug.LogException(e);
+            }
         }
     }
 
@@ -122,19 +145,23 @@ public class CombatStateMachine : MonoBehaviour
         }
     }
     private void Update() {
-        try {
-            currentState.StateUpdate();
-        }
-        catch (Exception e) {
-            Debug.LogException(e);
+        if (!ended) {
+            try {
+                currentState.StateUpdate();
+            }
+            catch (Exception e) {
+                Debug.LogException(e);
+            }
         }
     }
     private void FixedUpdate() {
-        try {
-            currentState.StateFixedUpdate();
-        }
-        catch (Exception e) {
-            Debug.LogException(e);
+        if (!ended) {
+            try {
+                currentState.StateFixedUpdate();
+            }
+            catch (Exception e) {
+                Debug.LogException(e);
+            }
         }
     }
 

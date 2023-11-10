@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19e7fe333093dc345ba5b2b49eff8cbd, type: 3}
   m_Name: Gail
   m_EditorClassIdentifier: 
-  max_Vitality: 39
+  max_Vitality: 8
   max_SP: 17
   power: 61
   equippedSkills:

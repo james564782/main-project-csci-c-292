@@ -4,6 +4,7 @@ using TMPro;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CombatSystem : MonoBehaviour
@@ -38,6 +39,9 @@ public class CombatSystem : MonoBehaviour
     Entity[] characterEntity;
     Entity[] enemyEntity;
 
+    private bool levelComplete = false; //False by default
+    private bool gameOver = false; //False by default
+
 
     private int turnNumber = 0; //Each time it is the players turn, increase by 1. Starts at 0.
 
@@ -53,6 +57,38 @@ public class CombatSystem : MonoBehaviour
         CreateEnemies();
         CreateCells();
         CreateUI();
+        levelComplete = false;
+        gameOver = false;
+    }
+
+    public bool GetLevelComplete() {
+        return levelComplete;
+    }
+    public bool GetGameOver() {
+        return gameOver;
+    }
+    public void SetLevelComplete(bool value) { //To set the level as complete
+        if (value) {
+            levelComplete = value;
+            stateMachine.SetEnded(value);
+            StartCoroutine(SceneLoadPause("WinScreen", 1f));
+        }
+    }
+    public void SetGameOver(bool value) { //To set the game as over.
+        if (value) {
+            gameOver = value;
+            stateMachine.SetEnded(value);
+            StartCoroutine(SceneLoadPause("Gameover", 2f));
+        }
+    }
+
+    IEnumerator SceneLoadPause(int nextScene, float time) {
+        yield return new WaitForSeconds(time);
+        SceneManager.LoadScene(nextScene);
+    }
+    IEnumerator SceneLoadPause(string nextScene, float time) {
+        yield return new WaitForSeconds(time);
+        SceneManager.LoadScene(nextScene);
     }
 
     private void CreateCells() { //Called in awake to set up game
@@ -100,7 +136,7 @@ public class CombatSystem : MonoBehaviour
             characterHealthBar[i].maxValue = characterEntity[i].data.GetMaxVitality();
             characterSpBar[i].maxValue = characterEntity[i].data.GetMaxSP();
             SetCharacterHealth(i, characterEntity[i].data.GetMaxVitality());
-            SetCharacterSP(i, characterEntity[i].data.GetMaxSP());
+            ModifyCharacterSPBar(i);
         }
         for (int i = 0; i < enemyHealthBar.Length;i++) {
             if (i < GetEnemyCount()) {
@@ -125,32 +161,52 @@ public class CombatSystem : MonoBehaviour
         int health = characterEntity[characterIndex].data.GetCurrentVitality();
         characterHealthBar[characterIndex].value = health;
         characterHealthText[characterIndex].text = "HP: " + health;
+        SetGameOver(IsGameOver());
     }
     public void ModifyCharacterHealth(int characterIndex, int healthModification) {
-        characterEntity[characterIndex].data.ModifyCurrentVitality(healthModification);
-        int health = characterEntity[characterIndex].data.GetCurrentVitality();
+        characterEntity[characterIndex].ModifyHealth(healthModification);
+        int health = characterEntity[characterIndex].GetCurrentHealth();
+        characterEntity[characterIndex].data.SetCurrentVitality(health);
         characterHealthBar[characterIndex].value = health;
         characterHealthText[characterIndex].text = "HP: " + health;
+        SetGameOver(IsGameOver());
     }
-    public void SetCharacterSP(int characterIndex, int spSet) {
-        characterEntity[characterIndex].data.SetCurrentSP(spSet);
-        int sP = characterEntity[characterIndex].data.GetCurrentSP();
+
+    public bool IsLevelComplete() { //If at least one enemy is still alive then the level isn't over
+        foreach (Entity entity in enemyEntity) {
+            if (entity.GetAlive()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public bool IsGameOver() { //If at least one character is still alive then the game isn't over
+        foreach (Entity entity in characterEntity) {
+            if (entity.GetAlive()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void ModifyCharacterSPBar(int characterIndex) {
+        int sP = characterEntity[characterIndex].GetSP();
         characterSpBar[characterIndex].value = sP;
         characterSpText[characterIndex].text = "SP: " + sP;
     }
-    public void ModifyCharacterSP(int characterIndex, int spModification) {
-        characterEntity[characterIndex].data.ModifyCurrentSP(spModification);
-        int sP = characterEntity[characterIndex].data.GetCurrentSP();
-        characterSpBar[characterIndex].value = sP;
-        characterSpText[characterIndex].text = "SP: " + sP;
+    public void ModifyCharacterSPBar(int characterIndex, int newSP) {
+        characterSpBar[characterIndex].value = newSP;
+        characterSpText[characterIndex].text = "SP: " + newSP;
     }
     public void SetEnemyHealth(int enemyIndex, int healthSet) { //This method probably doesn't work well, look at ModifyEnemyHealth
         enemyEntity[enemyIndex].data.SetCurrentVitality(healthSet);
         enemyHealthBar[enemyIndex].value = enemyEntity[enemyIndex].data.GetCurrentVitality();
+        SetLevelComplete(IsLevelComplete());
     }
     public void ModifyEnemyHealth(int enemyIndex, int healthModification) { //Can't modify the enemyData health since that corresponds to all enemies.
         enemyEntity[enemyIndex].ModifyHealth(healthModification);
         enemyHealthBar[enemyIndex].value = enemyEntity[enemyIndex].GetCurrentHealth();
+        SetLevelComplete(IsLevelComplete());
     }
     public void InflictBleedingToEnemy(int index, int turnCount, int damagePerTurn) {
         enemyEntity[index].InflictBleed(turnCount, damagePerTurn);
@@ -161,6 +217,17 @@ public class CombatSystem : MonoBehaviour
                 e.Bleed();
             }
         }
+    }
+
+    public int GetAlivePlayersCount() {
+        int alive = 0;
+        if (characterEntity[0].GetAlive()) {
+            alive++;
+        }
+        if (characterEntity[1].GetAlive()) {
+            alive++;
+        }
+        return alive;
     }
 
     public CharacterData GetCharacterData(bool character) { //True for dale 0, false for gail 1
@@ -263,6 +330,7 @@ public class CombatSystem : MonoBehaviour
         private int current_health;
         private bool alive;
         private int[] bleed; //[damage, turncount]
+        private int sp;
         public Entity(GameObject entityGameObject, EntityData entityData, int index) : this() {
             this.index = index;
             this.gameObject = entityGameObject;
@@ -272,6 +340,7 @@ public class CombatSystem : MonoBehaviour
             this.current_health = this.max_health;
             alive = true;
             this.bleed = new int[] { 0, 0 };
+            this.sp = data.GetMaxSP();
         }
         public Entity(bool alive) : this() {
             alive = false;
@@ -289,6 +358,15 @@ public class CombatSystem : MonoBehaviour
             current_health = Mathf.Clamp(current_health + modified_Vitality, 0, max_health);
             if (current_health <= 0) {
                 alive = false;
+                AnimateDeath();
+            }
+        }
+        public void AnimateDeath() {
+            if (data is EnemyData) {
+                gameObject.GetComponent<Animator>().Play("Sentry01Death", 0, 0.01f);
+            }
+            else {
+                gameObject.GetComponent<SpriteRenderer>().enabled = false;
             }
         }
         public void InflictBleed(int turnCount, int damage) {//Giving the effect
@@ -307,7 +385,16 @@ public class CombatSystem : MonoBehaviour
                 gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f);
             }
         }
-
+        public void SpendSP(int value) {
+            sp = Mathf.Clamp(sp - value, 0, data.GetMaxSP());
+            CombatSystem.system.ModifyCharacterSPBar(index, sp);
+        }
+        public int GetSP() {
+            return sp;
+        }
+        public int GetMaxSP() {
+            return data.GetMaxSP();
+        }
         public int GetCurrentHealth() {
             return current_health;
         }

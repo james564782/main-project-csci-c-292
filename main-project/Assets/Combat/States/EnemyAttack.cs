@@ -11,19 +11,25 @@ public class EnemyAttack : CombatState {
     public override void StateStart() {
         enemyAttackUI.SetActive(true);
         CombatSystem.system.ResolveAllEnemyBleeding();
-        StartCoroutine(AttackPhase());
+        if (!stateMachine.GetEnded()) {
+            StartCoroutine(AttackPhase());
+        }
     }
 
     public override void StateUpdate() {
-
+        if (Input.GetKeyDown("z") && !invulnerable[0] && CombatSystem.system.GetCharacterEntity(0).GetAlive()) { //Player 1 Defense
+            StartCoroutine(Jump(0));
+        }
+        if (Input.GetKeyDown("x") && !invulnerable[1] && CombatSystem.system.GetCharacterEntity(1).GetAlive()) { //Player 2 Defense
+            StartCoroutine(Jump(1));
+        }
     }
 
     IEnumerator AttackPhase() {
         CombatSystem.Entity[] enemies = CombatSystem.system.GetEnemyEntities();
         for (int i = 0; i < enemies.Length; i++) {
             if (enemies[i].GetAlive()) {
-                Debug.Log("enemy " + i + " attacks");
-                StartCoroutine(Attack(enemies[i], i, Random.Range(0, 2)));
+                StartCoroutine(Attack(enemies[i], i, GetRandomLivingPlayer()));
                 yield return new WaitForSeconds(Random.Range(0.75f, 2.75f));
             }
         }
@@ -31,6 +37,16 @@ public class EnemyAttack : CombatState {
             yield return null;
         }
         ChangeState("PlayerActionSelection");
+    }
+
+    private int GetRandomLivingPlayer() {
+        int random = Random.Range(0, 2);
+        if (CombatSystem.system.GetCharacterEntity(random).GetAlive()) {
+            return random;
+        }
+        else {
+            return (random < 1 ? 1 : 0);
+        }
     }
 
     IEnumerator Jump(int index) {
@@ -50,7 +66,7 @@ public class EnemyAttack : CombatState {
 
     IEnumerator Attack(CombatSystem.Entity enemy, int index, int target) {
         coroutineRunning[index] = true;
-        yield return null;
+        bool attacked = false;
         float attackRate = Random.Range(4.0f, 5.0f);
         float returnRate = 0.6f;
         GameObject obj = enemy.gameObject;
@@ -67,11 +83,9 @@ public class EnemyAttack : CombatState {
             actualPosition += direction * attackRate * Time.deltaTime;
             obj.transform.position = actualPosition + up;
             obj.GetComponent<SpriteRenderer>().sortingOrder = -Mathf.RoundToInt(obj.transform.position.y);
-            if (Input.GetKeyDown("z") && !invulnerable[0]) { //Player 1 Defense
-                StartCoroutine(Jump(0));
-            }
-            if (Input.GetKeyDown("x") && !invulnerable[1]) { //Player 2 Defense
-                StartCoroutine(Jump(1));
+            if (Mathf.Abs(obj.transform.position.x - CombatSystem.system.GetCharacterEntity(target).gameObject.transform.position.x) < 0.4 && !attacked && !invulnerable[target]) {
+                attacked = true;
+                CombatSystem.system.ModifyCharacterHealth(target, -enemy.data.GetPower());
             }
             yield return null;
         }

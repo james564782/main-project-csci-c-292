@@ -34,51 +34,65 @@ public class PlayerSkillUsage : CombatState {
     }
 
     IEnumerator SkillUsage() {
-        Debug.Log("Initial Pause");
         yield return new WaitForSeconds(0.25f);
-        Debug.Log("Start Skill Usage");
         foreach (var skillEvent in skill.GetEvents()) {
-            if (skillEvent is SkillHealthModification) {
+            if (skillEvent is SkillHealthModification && GetTargetAlive(currentTarget)) {
                 ResolveHealthModify((SkillHealthModification)skillEvent, currentTarget);
                 CombatSystem.system.CharacterAttack(stateMachine.GetCharacter());
             }
-            else if (skillEvent is SkillBleed) {
+            else if (skillEvent is SkillBleed && GetTargetAlive(currentTarget)) {
                 ResolveBleed((SkillBleed)skillEvent, currentTarget);
                 CombatSystem.system.CharacterAttack(stateMachine.GetCharacter());
             }
-            else if (skillEvent is SkillStatModifier) {
+            else if (skillEvent is SkillStatModifier && GetTargetAlive(currentTarget)) {
                 Debug.Log("Stat Modify");
             }
             else if (skillEvent is SkillTarget) {
                 if (((SkillTarget)skillEvent).targets.Length <= 0) {
                     break;
                 }
-                int enemyCount = CombatSystem.system.GetEnemyCount();
+                int entityCount = CombatSystem.system.GetEnemyCount();
                 int selected = 0;
                 SkillTarget.Targets[] targets = ((SkillTarget)skillEvent).targets;
                 bool[] target = new bool[6];
                 if (targets.Length > 1) {
                     target = targets[selected].GetTargets();
                 }
+                bool special = false; //This is really only possible because player 0 is the only one with a self & ally targeting skill, and if the other player is dead then the target doesn't matter.
                 if (targets[selected].GetTargets()[4] || targets[selected].GetTargets()[5]) {
-                    enemyCount = 2; //This might not work anymore if one of the players die.
+                    entityCount = CombatSystem.system.GetAlivePlayersCount();
+                    if (entityCount <= 1) {
+                        selected = 0;
+                        special = true;
+                    }
                 }
-                while (!Input.GetKeyDown("z") && !Input.GetKeyDown(KeyCode.Space) && targets.Length > 1) {
+                while (!Input.GetKeyDown("z") && !Input.GetKeyDown(KeyCode.Space) && targets.Length > 1 && !special) {
                     if (Input.GetKeyDown("s") || Input.GetKeyDown("down") || Input.GetKeyDown("left") || Input.GetKeyDown("a")) {
-                        selected = (int)Mathf.Repeat(selected - 1, enemyCount);
+                        selected = (int)Mathf.Repeat(selected - 1, entityCount);
+                        stateMachine.PlaySelectionUISound();
                     }
                     else if (Input.GetKeyDown("w") || Input.GetKeyDown("up") || Input.GetKeyDown("right") || Input.GetKeyDown("d")) {
-                        selected = (int)Mathf.Repeat(selected + 1, enemyCount);
+                        selected = (int)Mathf.Repeat(selected + 1, entityCount);
+                        stateMachine.PlaySelectionUISound();
                     }
-                    Highlight(targets[selected].GetTargets());
-
+                    if (targets[selected].GetTargets()[4] || targets[selected].GetTargets()[5]) {
+                        Highlight(targets[selected].GetTargets());
+                    }
+                    else {
+                        Highlight(targets[GetSelectedEnemyIndex(selected)].GetTargets());
+                    }
                     yield return null;
                 }
-                target = targets[selected].GetTargets();
+                if (targets[selected].GetTargets()[4] || targets[selected].GetTargets()[5] || targets.Length <= 1 || special) {
+                    target = targets[selected].GetTargets();
+                }
+                else {
+                    target = targets[GetSelectedEnemyIndex(selected)].GetTargets();
+                }
                 currentTarget = target;
                 RemoveHighlight();
             }
-            else if (skillEvent is SkillQuickTime) {
+            else if (skillEvent is SkillQuickTime && GetTargetAlive(currentTarget)) {
                 SkillQuickTime quickTime = (SkillQuickTime)skillEvent;
                 if (quickTime.GetRate() <= 0) {
                     proximity = -1; //if the rate is 0 or less then the proximity is reset.
@@ -97,6 +111,7 @@ public class PlayerSkillUsage : CombatState {
                         else {
                             proximity = 0.5f;
                         }
+                        skill.PlaySound();
                         yield return new WaitForSeconds(0.2f);
                         break;
                     }
@@ -106,6 +121,47 @@ public class PlayerSkillUsage : CombatState {
             }
         }
         ChangeState("PlayerActionSelection", true);
+    }
+
+    public int GetSelectedEnemyIndex(int index) { //If an enemy is dead it will still have the same index, this is to change stuff if an enemy is dead.
+        int indexed = index;
+        for (int i = 0; i < 4; i++) {
+            if (!CombatSystem.system.GetEnemyEntities()[i].GetAlive()) {
+                indexed++;
+            }
+            if (i == indexed) {
+                break;
+            }
+        }
+        if (indexed >= 4) {
+            Debug.Log("!!!Something is wrong, all of the enemies are probably dead!!!");
+            Debug.Break();
+            return 0;
+        }
+        else {
+            return indexed;
+        }
+    }
+
+    public bool GetTargetAlive(bool[] targets) { //Checks if at least one of the targets is alive.
+        bool value = false;
+        CombatSystem.Entity[] enemy = CombatSystem.system.GetEnemyEntities();
+        CombatSystem.Entity[] characters = new CombatSystem.Entity[] { CombatSystem.system.GetCharacterEntity(0), CombatSystem.system.GetCharacterEntity(1) };
+        for (int i = 0; i < 4; i++) {
+            if (targets[i]) {
+                if (enemy[i].GetAlive()) {
+                    value = true; break;
+                }
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (targets[4+i]) {
+                if (characters[i].GetAlive()) {
+                    value = true; break;
+                }
+            }
+        }
+        return value;
     }
 
     private void CreateSliderBackground(SkillQuickTime quickTime) {

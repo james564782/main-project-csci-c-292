@@ -18,5 +18,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8373edeb461ee964d99b70e4a1f8fb5b, type: 2}
   - {fileID: 11400000, guid: 062d36eb613bd2f4d93907c8821dd8b3, type: 2}
   - {fileID: 11400000, guid: 4e3ad76c3aa89d741bd8c774c436fd9e, type: 2}
-  sP: 0
+  sP: 1
   description: You deal a lot of damage to the enemy and a little to yourself.
+  sound: {fileID: 8300000, guid: 84e427d6b66ab4066b6a4dcd0ce819ee, type: 3}

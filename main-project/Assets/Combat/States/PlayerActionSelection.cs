@@ -11,8 +11,13 @@ public class PlayerActionSelection : CombatState
     [SerializeField] TextMeshProUGUI itemsText;
     [SerializeField] TextMeshProUGUI tacticsText;
     [SerializeField] TextMeshProUGUI switchText;
+    int selected = 0;
 
     public override void StateStart() {
+        if (!stateMachine.GetCharacterEntity().GetAlive()) { //If the character is dead then change to the other one and reset action selection
+            stateMachine.ChangeCharacter();
+            ChangeState("PlayerActionSelection");
+        }
         selectionUI.SetActive(true);
     }
 
@@ -22,50 +27,68 @@ public class PlayerActionSelection : CombatState
             itemsText.text = "Items";
             tacticsText.text = "Tactics";
             switchText.text = "Switch";
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-                ChangeState("PlayerSkillSelection");
-            }
+            selected = 0;
         }
         else if (Input.GetKey("w") || Input.GetKey("up")) { //Items
             skillsText.text = "Skills";
             itemsText.text = "<b>Items</b>";
             tacticsText.text = "Tactics";
             switchText.text = "Switch";
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-                ChangeState("PlayerItemSelection");
-            }
+            selected = 1;
         }
         else if (Input.GetKey("a") || Input.GetKey("left")) { //Tactics
             skillsText.text = "Skills";
             itemsText.text = "Items";
             tacticsText.text = "<b>Tactics</b>";
             switchText.text = "Switch";
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-                ChangeState("PlayerTacticSelection");
-            }
+            selected = 2;
         }
         else if (Input.GetKey("s") || Input.GetKey("down")) { //Switch
             skillsText.text = "Skills";
             itemsText.text = "Items";
             tacticsText.text = "Tactics";
             switchText.text = "<b>Switch</b>";
-            if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
-                ChangeState("PlayerSwitch");
+            selected = 3;
+        }
+        if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
+            switch (selected) {
+                case 0:
+                    stateMachine.PlaySelectionUISound();
+                    ChangeState("PlayerSkillSelection");
+                    break;
+                case 1:
+                    stateMachine.PlaySelectionUISound();
+                    ChangeState("PlayerItemSelection");
+                    break;
+                case 2:
+                    stateMachine.PlaySelectionUISound();
+                    ChangeState("PlayerTacticSelection");
+                    break;
+                case 3:
+                    stateMachine.PlaySelectionUISound();
+                    ChangeState("PlayerSwitch");
+                    break;
             }
         }
-        else {
-            skillsText.text = "Skills";
-            itemsText.text = "Items";
-            tacticsText.text = "Tactics";
-            switchText.text = "Switch";
+
+            /*else {
+                skillsText.text = "Skills";
+                itemsText.text = "Items";
+                tacticsText.text = "Tactics";
+                switchText.text = "Switch";
+            }*/
         }
-    }
 
     public override void StateFixedUpdate() {
 
     }
 
     protected override void ExitState() {
+        selected = 0;
+        skillsText.text = "Skills";
+        itemsText.text = "Items";
+        tacticsText.text = "Tactics";
+        switchText.text = "Switch";
         selectionUI.SetActive(false);
     }
 

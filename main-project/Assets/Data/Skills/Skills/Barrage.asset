@@ -24,5 +24,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 95c83427a89dcca49bac6fad2645ff01, type: 2}
   - {fileID: 11400000, guid: 2a41be7a81dbcb44881c81042a8fba2e, type: 2}
   - {fileID: 11400000, guid: 95c83427a89dcca49bac6fad2645ff01, type: 2}
-  sP: 0
+  sP: 3
   description: You make a lot of attacks a random enemy with each attack.
+  sound: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}

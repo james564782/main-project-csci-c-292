@@ -6,6 +6,7 @@ public class PlayerSwitch : CombatState {
 
     public override void StateStart() {
         stateMachine.ChangeCharacter();
+        stateMachine.PlaySelectionUISound();
         stateMachine.ChangeState("PlayerActionSelection");
     }
 

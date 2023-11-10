@@ -16,5 +16,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b19c4e9e47b32694c81c612f8eed8c3b, type: 2}
   - {fileID: 11400000, guid: 8342fd43a242fdb48b2dc658528df032, type: 2}
   - {fileID: 11400000, guid: 5977004109625c144a34fb3e8a698be4, type: 2}
-  sP: 0
+  sP: 3
   description: You inflict the bleeding effect on the enemy.
+  sound: {fileID: 8300000, guid: a931da70ee74947d5a047de583170ade, type: 3}

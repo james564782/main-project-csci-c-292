@@ -9,6 +9,7 @@ public class PlayerSkillSelection : CombatState {
     [SerializeField] TextMeshProUGUI[] skillOptionText;
     [SerializeField] TextMeshProUGUI[] skillSpText;
     private int selected = 0;
+    private int sp = 0;
     Skill[] skill;
 
     public override void StateStart() {
@@ -27,24 +28,35 @@ public class PlayerSkillSelection : CombatState {
                 skillSpText[i].enabled = false;
             }
         }
+        sp = stateMachine.GetCharacterEntity().GetSP();
     }
 
     public override void StateUpdate() {
         if (Input.GetKey("x") || Input.GetKey(KeyCode.Backspace)) { //Back
+            stateMachine.PlaySelectionUISound();
             ChangeState("PlayerActionSelection");
         }
         if (Input.GetKeyDown("s") || Input.GetKeyDown("down")) {
+            stateMachine.PlaySelectionUISound();
             skillOptionText[selected].text = skill[selected].name;
             skillSpText[selected].text = skill[selected].GetSPCost() + " SP";
             selected = (int)Mathf.Repeat(selected + 1, skill.Length);
         } 
         else if (Input.GetKeyDown("w") || Input.GetKeyDown("up")) {
+            stateMachine.PlaySelectionUISound();
             skillOptionText[selected].text = skill[selected].name;
             skillSpText[selected].text = skill[selected].GetSPCost() + " SP";
             selected = (int)Mathf.Repeat(selected - 1, skill.Length);
         }
         else if (Input.GetKeyDown("z") || Input.GetKeyDown(KeyCode.Space)) {
-            ChangeState("PlayerSkillUsage", skill[selected]);
+            if (sp >= skill[selected].GetSPCost()) {
+                stateMachine.SpendSP(skill[selected].GetSPCost());
+                ChangeState("PlayerSkillUsage", skill[selected]);
+                stateMachine.PlaySelectionUISound();
+            }
+            else {
+                Debug.Log("trying to spend " + skill[selected].GetSPCost() + " sp, but only have " + sp + " sp");
+            }
         }
         skillOptionText[selected].text = "<b>" + skill[selected].name + "</b>";
         skillSpText[selected].text = "<b>" + skill[selected].GetSPCost() + " SP" + "</b>";

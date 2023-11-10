@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerTacticSelection : CombatState {
 
@@ -27,6 +28,7 @@ public class PlayerTacticSelection : CombatState {
             skipTurnText.text = "<b>Skip Turn</b>";
             runAwayText.text = "Run Away";
             if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
+                stateMachine.PlaySelectionUISound();
                 ChangeState("PlayerActionSelection", true);
             }
         }
@@ -34,7 +36,9 @@ public class PlayerTacticSelection : CombatState {
             skipTurnText.text = "Skip Turn";
             runAwayText.text = "<b>Run Away</b>";
             if (Input.GetKeyUp("z") || Input.GetKeyUp("space")) {
+                stateMachine.PlaySelectionUISound();
                 //ChangeState("Run Away");
+                SceneManager.LoadScene(0);
                 Debug.Log("Changed to type: Run Away (Didn't Actually Change Though)");
             }
         }

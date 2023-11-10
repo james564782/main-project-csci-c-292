@@ -19,3 +19,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5eddd43583250a14f8e50a93c259598e, type: 2}
   sP: 0
   description: A powerful attack
+  sound: {fileID: 8300000, guid: 7e26c9daf4c32483b9c2790e662d3f1b, type: 3}
