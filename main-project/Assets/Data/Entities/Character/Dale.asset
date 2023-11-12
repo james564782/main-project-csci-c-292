@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19e7fe333093dc345ba5b2b49eff8cbd, type: 3}
   m_Name: Dale
   m_EditorClassIdentifier: 
-  max_Vitality: 7
-  max_SP: 29
-  power: 49
+  max_Vitality: 45
+  max_SP: 30
+  power: 30
+  current_Vitality: 45
   equippedSkills:
   - {fileID: 11400000, guid: cecd638262c9ec74e902dcd02f568413, type: 2}
   - {fileID: 11400000, guid: 5ec4d70fc342c2d49b14f12961ca1354, type: 2}

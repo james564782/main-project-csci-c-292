@@ -43,6 +43,9 @@ public class CombatStateMachine : MonoBehaviour
     public CombatSystem.Entity GetCharacterEntity() {
         return CombatSystem.system.GetCharacterEntity(GetCharacter() ? 0 : 1);
     }
+    public int GetCharacterNumber() {
+        return selectedCharacter ? 0 : 1;
+    }
     public CharacterData GetCharacterData() {
         return CombatSystem.system.GetCharacterData(selectedCharacter);
     }
@@ -63,8 +66,12 @@ public class CombatStateMachine : MonoBehaviour
         selectedCharacter = !selectedCharacter;
         HighlightCharacter(true);
     }
+    public void HighlightCharacter() {
+        HighlightCharacter(true);
+    }
     public void SpendSP(int sp) {
         GetCharacterEntity().SpendSP(sp);
+        CombatSystem.system.SpendSP(GetCharacterNumber(), sp);
     }
 
     public void EndPlayerTurn() {

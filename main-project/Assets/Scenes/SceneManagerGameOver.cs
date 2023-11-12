@@ -9,7 +9,6 @@ public class SceneManagerGameOver : MonoBehaviour {
     [SerializeField] TextMeshProUGUI playAgainText;
     [SerializeField] TextMeshProUGUI mainMenuText;
     bool selected = true;
-
     public void PlayAgain() {
         SceneManager.LoadScene("Combat01");
     }

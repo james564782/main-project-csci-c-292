@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animation: {fileID: 0}
   point: 0.735
-  size: 0.179
+  size: 0.1
   rate: 1.3

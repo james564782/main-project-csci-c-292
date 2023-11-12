@@ -9,6 +9,7 @@ public class SceneManagerMainMenu : MonoBehaviour
     [SerializeField] TextMeshProUGUI playText;
     [SerializeField] TextMeshProUGUI quitText;
     bool selected = true;
+
     public void StartGame() {
         SceneManager.LoadScene("Combat01");
     }

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   events:
   - {fileID: 11400000, guid: 5e044b07d46189c49a7ad6d5bcca0d8b, type: 2}
-  - {fileID: 11400000, guid: 39f1b291a901bb043806fd1071628fcd, type: 2}
+  - {fileID: 11400000, guid: e188329b2985cf24fbd6a7203a0df112, type: 2}
   - {fileID: 11400000, guid: 4e3ad76c3aa89d741bd8c774c436fd9e, type: 2}
-  sP: 4
+  sP: 5
   description: You attack all of the enemies at once
   sound: {fileID: 8300000, guid: ff5f85da24bc943d1abdc5760a22bc81, type: 3}

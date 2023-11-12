@@ -13,23 +13,23 @@ public class SoundBoard : MonoBehaviour
     public void Awake() {
         instance = this;
         audioSource = GetComponentsInChildren<AudioSource>();
-        if (audioSource.Length < 1) {
-            Debug.Log("Something do be wrong with the sound");
-            Debug.Break();
-        }
-        audioSource[0].clip = music[0];   
-        audioSource[0].Play();
+        //if (audioSource.Length < 1) {
+        //    Debug.Log("Something do be wrong with the sound");
+        //    Debug.Break();
+        //}
+        //audioSource[0].clip = music[0];   
+        //audioSource[0].Play();
     }
 
     public void PlayAudio(int type, int selection) {
 
     }
     public void PlayAudio(AudioClip clip) {
-        audioSource[6].PlayOneShot(clip);
+        audioSource[0].PlayOneShot(clip);
     }
 
     public void PlayAudio(AudioClip clip, float volumeScale) {
-        audioSource[6].PlayOneShot(clip, volumeScale);
+        audioSource[0].PlayOneShot(clip, volumeScale);
     }
 
 }

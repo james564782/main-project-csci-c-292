@@ -27,11 +27,14 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] Image[] enemyImage;
     [SerializeField] Slider[] enemyHealthBar;
     [SerializeField] TextMeshProUGUI[] enemyName;
+    [SerializeField] RectTransform[] transitions; //[0 is the up transition, 1 is the down transition]
 
     [Header("Prefabs")]
     [SerializeField] GameObject[] characterPrefab;
     [SerializeField] GameObject[] enemyPrefab;
 
+    [Header("Other")]
+    [SerializeField] string nextLevelName;
 
 
     Cell[] playerCell = new Cell[2];
@@ -41,6 +44,7 @@ public class CombatSystem : MonoBehaviour
 
     private bool levelComplete = false; //False by default
     private bool gameOver = false; //False by default
+    private bool[] transitionActive = new bool[] { false, false }; //If true then it is covering the screen, if false then it is not
 
 
     private int turnNumber = 0; //Each time it is the players turn, increase by 1. Starts at 0.
@@ -53,12 +57,25 @@ public class CombatSystem : MonoBehaviour
     }
 
     private void SetUpGame() {
+        StartCoroutine(EntryTransition());
         CreateCharacters();
         CreateEnemies();
         CreateCells();
         CreateUI();
         levelComplete = false;
         gameOver = false;
+    }
+
+    IEnumerator EntryTransition() {
+        transitions[1].gameObject.SetActive(true);
+        Vector3 startPosition = new Vector3(0, -500, 0);
+        Vector3 endPosition = new Vector3(0, 500, 0);
+        transitionActive[1] = true;
+        for (float i = 0; i < 1f; i += Time.deltaTime / 0.75f) {
+            transitions[1].localPosition = Vector3.Lerp(startPosition, endPosition, i);
+            yield return null;
+        }
+        transitionActive[1] = false;
     }
 
     public bool GetLevelComplete() {
@@ -71,23 +88,26 @@ public class CombatSystem : MonoBehaviour
         if (value) {
             levelComplete = value;
             stateMachine.SetEnded(value);
-            StartCoroutine(SceneLoadPause("WinScreen", 1f));
+            StartCoroutine(TransitionToScene(nextLevelName, 0.75f, 0.5f));
         }
     }
     public void SetGameOver(bool value) { //To set the game as over.
         if (value) {
             gameOver = value;
             stateMachine.SetEnded(value);
-            StartCoroutine(SceneLoadPause("Gameover", 2f));
+            StartCoroutine(TransitionToScene("Gameover", 0.75f, 0.5f));
         }
     }
-
-    IEnumerator SceneLoadPause(int nextScene, float time) {
-        yield return new WaitForSeconds(time);
-        SceneManager.LoadScene(nextScene);
-    }
-    IEnumerator SceneLoadPause(string nextScene, float time) {
-        yield return new WaitForSeconds(time);
+    IEnumerator TransitionToScene(string nextScene, float time, float initialPause) {
+        transitions[0].gameObject.SetActive(true);
+        yield return new WaitForSeconds(initialPause);
+        Vector3 startPosition = new Vector3(0, -500, 0);
+        Vector3 endPosition = new Vector3(0, 500, 0);
+        transitionActive[0] = true;
+        for (float i = 0; i < 1f; i += Time.deltaTime / time) {
+            transitions[0].localPosition = Vector3.Lerp(startPosition, endPosition, i);
+            yield return null;
+        }
         SceneManager.LoadScene(nextScene);
     }
 
@@ -306,7 +326,26 @@ public class CombatSystem : MonoBehaviour
         return characterEntity[index];
     }
 
-    public struct Cell {
+    public void TurnIconBarsInvisible(bool isEnemy, int count) {
+        if (isEnemy && count < 4) {
+            enemyHealthBar[count].gameObject.SetActive(false);
+            enemyImage[count].gameObject.SetActive(false);
+            enemyName[count].gameObject.SetActive(false);
+        }
+        else if (!isEnemy && count < 2) {
+            characterHealthBar[count].gameObject.SetActive(false);
+            characterSpBar[count].gameObject.SetActive(false);
+            characterHealthText[count].gameObject.SetActive(false);
+            characterSpText[count].gameObject.SetActive(false);
+            characterImage[count].gameObject.SetActive(false);
+        }
+    }
+
+    public void SpendSP(int characterIndex, int spent) {
+        characterEntity[characterIndex].SpendSP(spent);
+    }
+
+    public struct Cell { //Didn't really end up using this
         //private Entity entity; //null if nothing
         //private Transform position;
         public Entity entity { get; set; }
@@ -330,7 +369,7 @@ public class CombatSystem : MonoBehaviour
         private int current_health;
         private bool alive;
         private int[] bleed; //[damage, turncount]
-        private int sp;
+        private int sp { get; set; }
         public Entity(GameObject entityGameObject, EntityData entityData, int index) : this() {
             this.index = index;
             this.gameObject = entityGameObject;
@@ -356,17 +395,28 @@ public class CombatSystem : MonoBehaviour
         }
         public void ModifyHealth(int modified_Vitality) {
             current_health = Mathf.Clamp(current_health + modified_Vitality, 0, max_health);
-            if (current_health <= 0) {
+            if (current_health <= 0 || !alive) {
                 alive = false;
                 AnimateDeath();
+            }
+            else {
+                AnimateDamage();
+            }
+        }
+
+        public void AnimateDamage() {
+            if (data is EnemyData) {
+                gameObject.GetComponent<Animator>().Play("Sentry01Damage", 0, 0.01f);
             }
         }
         public void AnimateDeath() {
             if (data is EnemyData) {
                 gameObject.GetComponent<Animator>().Play("Sentry01Death", 0, 0.01f);
+                CombatSystem.system.TurnIconBarsInvisible(true, index);
             }
             else {
                 gameObject.GetComponent<SpriteRenderer>().enabled = false;
+                CombatSystem.system.TurnIconBarsInvisible(false, index);
             }
         }
         public void InflictBleed(int turnCount, int damage) {//Giving the effect
@@ -386,11 +436,14 @@ public class CombatSystem : MonoBehaviour
             }
         }
         public void SpendSP(int value) {
-            sp = Mathf.Clamp(sp - value, 0, data.GetMaxSP());
+            SetSP(sp - value);
             CombatSystem.system.ModifyCharacterSPBar(index, sp);
         }
         public int GetSP() {
             return sp;
+        }
+        public void SetSP(int newValue) {
+            sp = Mathf.Clamp(newValue, 0, data.GetMaxSP());
         }
         public int GetMaxSP() {
             return data.GetMaxSP();

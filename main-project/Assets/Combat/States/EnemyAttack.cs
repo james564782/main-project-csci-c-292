@@ -30,7 +30,7 @@ public class EnemyAttack : CombatState {
         for (int i = 0; i < enemies.Length; i++) {
             if (enemies[i].GetAlive()) {
                 StartCoroutine(Attack(enemies[i], i, GetRandomLivingPlayer()));
-                yield return new WaitForSeconds(Random.Range(0.75f, 2.75f));
+                yield return new WaitForSeconds(Random.Range(0.75f, 2.00f));
             }
         }
         while (coroutineRunning[0] || coroutineRunning[1] || coroutineRunning[2] || coroutineRunning[3]) {
@@ -67,7 +67,7 @@ public class EnemyAttack : CombatState {
     IEnumerator Attack(CombatSystem.Entity enemy, int index, int target) {
         coroutineRunning[index] = true;
         bool attacked = false;
-        float attackRate = Random.Range(4.0f, 5.0f);
+        float attackRate = Random.Range(4.5f, 6.0f);
         float returnRate = 0.6f;
         GameObject obj = enemy.gameObject;
         Vector3 startPosition = obj.transform.position;
@@ -106,5 +106,6 @@ public class EnemyAttack : CombatState {
     }
     protected override void ExitState() {
         enemyAttackUI.SetActive(false);
+        stateMachine.HighlightCharacter(true);
     }
 }

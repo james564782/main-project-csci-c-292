@@ -98,6 +98,7 @@ public class PlayerSkillUsage : CombatState {
                     proximity = -1; //if the rate is 0 or less then the proximity is reset.
                     break;
                 }
+                bool playedSound = false;
                 quickTimeUI.SetActive(true);
                 CreateSliderBackground(quickTime);
                 for (float i = 0; i <= 1; i += Time.deltaTime * quickTime.GetRate()) { //Quick Time
@@ -112,10 +113,14 @@ public class PlayerSkillUsage : CombatState {
                             proximity = 0.5f;
                         }
                         skill.PlaySound();
+                        playedSound = true;
                         yield return new WaitForSeconds(0.2f);
                         break;
                     }
                     proximity = 0.5f;
+                }
+                if (!playedSound) {
+                    skill.PlaySound();
                 }
                 quickTimeUI.SetActive(false);
             }
