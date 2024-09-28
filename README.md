@@ -2,6 +2,8 @@
 Final Project for CSCI-C 292.
 
 Controls use WASD or Arrow Keys to cycle through options and Z or Space Bar to select.
+
+Play the game here: https://teh-turtle.itch.io/roboreign
 ## Implementation
 - Created using Unity Engine
 ## References
