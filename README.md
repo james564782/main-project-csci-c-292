@@ -1,3 +1,5 @@
+![Alt text](.CoverImage.png)
+
 # RoboReign
 Final Project for CSCI-C 292.
 
